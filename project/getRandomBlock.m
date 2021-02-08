@@ -1,4 +1,4 @@
-function [I] = getRandonBlock(img, size_block)
+function [I] = getRandomBlock(img, size_block)
 
     [height, width, ~] = size(img);
     
@@ -7,8 +7,10 @@ function [I] = getRandonBlock(img, size_block)
     
     if (ndims(img) == 3)
         I = img(row : row+size_block-1, col : col+size_block-1, :);
-    else
+    elseif (ndims(img) == 1)
         I = img(row : row+size_block-1, col : col+size_block-1);
+    else
+        error("MyError: unexpected number of channels");
     end
     
 end
