@@ -1,7 +1,4 @@
 function [ssd] = getSSD(current_block, new_block, size_overlap, overlap_type)
-
-    %img = (img - img2) .^ 2;
-    %ssd = sum(img(:));
     
     size_block = size(current_block, 1);
     

@@ -1,4 +1,4 @@
-function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, overlap_type)
+function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, overlap_type, use_seam_cut)
 
     [height, width, ~] = size(img);
     size_block = size(current_block, 1);
@@ -14,7 +14,7 @@ function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, ov
             new_block = img(i:i+size_block-1, j:j+size_block-1, :);
             ssd = getSSD(current_block, new_block, size_overlap, overlap_type);
             if ssd == 0
-                ssd = Inf;
+                ssd = inf;
             end
             errors_of_all_patches(i,j) = ssd;
         end
@@ -24,7 +24,7 @@ function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, ov
     minimum_error = min(errors_of_all_patches(:));
     [y, x] = find(errors_of_all_patches <= minimum_error * (tolerance));
     
-    % If we sampled more than n_best, decrease tolerance and sample again
+    % If we sampled more than 'n_best', decrease tolerance and sample again
     n_blocks = size(y,1);
     while n_blocks > n_best
         tolerance = (tolerance-1) / 2 + 1;
@@ -37,6 +37,12 @@ function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, ov
     i = y(block_index);
     j = x(block_index);
     
+    % Method 2 part is done
     I = img(i:i+size_block-1, j:j+size_block-1, :);
+    
+    % Minimum Error Boundary Cut for Method 3
+    if use_seam_cut
+        I = seamCut(current_block, I, size_overlap, overlap_type);
+    end
     
 end

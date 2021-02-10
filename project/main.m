@@ -36,5 +36,6 @@ img_rice = im2double(img_rice);
 % imshow(I);
 
 I2 = method_2(img_rice, size_block, size_overlap, out_height, out_width, tolerance, n_best);
+I3 = method_3(img_rice, size_block, size_overlap, out_height, out_width, tolerance, n_best);
 
-imshow([I I2]);
+imshow([I I2 I3]);
