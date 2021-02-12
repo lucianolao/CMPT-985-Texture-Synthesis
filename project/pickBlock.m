@@ -1,4 +1,4 @@
-function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, overlap_type, bool_seam_cut, bool_transfer, img_transfer, alpha)
+function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, overlap_type, bool_seam_cut, bool_transfer, img_transfer, alpha, img_squared_left, img_squared_top, img_squared_top_minus_left)
 
     [height, width, ~] = size(img);
     size_block = size(current_block, 1);
@@ -10,19 +10,25 @@ function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, ov
     block_transfer = 0;
     
     % Compute all errors
-    for i = 1:1:max_initial_height
-        for j = 1:1:max_initial_width
-            new_block = img(i:i+size_block-1, j:j+size_block-1, :);
-            if bool_transfer
-                block_transfer = img_transfer(i:i+size_block-1, j:j+size_block-1, :);
-            end
-            [ssd] = computeSSD(current_block, new_block, size_overlap, overlap_type, bool_transfer, block_transfer, alpha);
-            errors_of_all_patches(i,j) = ssd;
-        end
-    end
+%     for i = 1:1:max_initial_height
+%         for j = 1:1:max_initial_width
+%             new_block = img(i:i+size_block-1, j:j+size_block-1, :);
+%             if bool_transfer
+%                 block_transfer = img_transfer(i:i+size_block-1, j:j+size_block-1, :);
+%             end
+%             [ssd] = computeSSD(current_block, new_block, size_overlap, overlap_type, bool_transfer, block_transfer, alpha);
+%             errors_of_all_patches(i,j) = ssd;
+%         end
+%     end
+    
+    % Optimized SSD computation
+    % DELETE new_block, block_transfer
+    ret = computeSSD(img, current_block, size_overlap, overlap_type, bool_transfer, alpha, img_squared_left, img_squared_top, img_squared_top_minus_left);
+    errors_of_all_patches = ret(1:max_initial_height, 1:max_initial_width);
     
     % Sample a few blocks with low error
     minimum_error = min(errors_of_all_patches(:));
+    minimum_error = max(0, minimum_error);
     [y, x] = find(errors_of_all_patches <= minimum_error * (tolerance));
     
     % If we sampled more than 'n_best', decrease tolerance and sample again

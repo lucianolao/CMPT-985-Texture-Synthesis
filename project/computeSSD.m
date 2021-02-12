@@ -1,37 +1,120 @@
-function [ssd] = computeSSD(current_block, new_block, size_overlap, overlap_type, bool_transfer, block_transfer, alpha)
+function [ssd] = computeSSD(img, current_block, size_overlap, overlap_type, bool_transfer, alpha, img_squared_left, img_squared_top, img_squared_top_minus_left)
     
+    [height, width, ch] = size(img);
     size_block = size(current_block, 1);
     
-    if overlap_type == "left"
-        region = (current_block(1:size_block, 1:size_overlap, :) - new_block(1:size_block, 1:size_overlap, :));
-        region = region .^ 2;
-        ssd = sum(region(:));
+    ssd_left = 0;
+    ssd_top = 0;
+    
+    if overlap_type == "left" || overlap_type == "double"
+        % left = (current_block(1:size_block, 1:size_overlap, :) - new_block(1:size_block, 1:size_overlap, :));
+        % left = left .^ 2;
+        % ssd = sum(left(:));
         
-    elseif overlap_type == "top"
-        region = (current_block(1:size_overlap, 1:size_block, :) - new_block(1:size_overlap, 1:size_block, :));
-        region = region .^ 2;
-        ssd = sum(region(:));
+        overlap_left = current_block(1:size_block, 1:size_overlap, :);
+        overlap_left_squared = overlap_left .^ 2;
+        overlap_left_squared_sum = sum(overlap_left_squared(:));
         
-    elseif overlap_type == "double"
-        left = (current_block(1:size_block, 1:size_overlap, :) - new_block(1:size_block, 1:size_overlap, :));
-        left = left .^ 2;
-        ssd_left = sum(left(:));
+        if ch == 1
+            two_A_B = 2 * conv2(padarray(img,size(overlap_left)-1,'post'), rot90(overlap_left,2), 'valid');
+        elseif ch == 3
+            [h,w,~] = size(overlap_left);
+            two_A_B_red = 2 * conv2(padarray(img(:,:,1),[h-1 w-1],'post'), rot90(overlap_left(:,:,1),2), 'valid');
+            two_A_B_green = 2 * conv2(padarray(img(:,:,2),[h-1 w-1],'post'), rot90(overlap_left(:,:,2),2), 'valid');
+            two_A_B_blue = 2 * conv2(padarray(img(:,:,3),[h-1 w-1],'post'), rot90(overlap_left(:,:,3),2), 'valid');
+            two_A_B = zeros(height, width, ch);
+            two_A_B(:,:,1) = two_A_B_red;
+            two_A_B(:,:,2) = two_A_B_green;
+            two_A_B(:,:,3) = two_A_B_blue;
+        else
+            error("MyError: unexpected number of channels");
+        end
         
-        top = (current_block(1:size_overlap, 1+size_overlap:size_block, :) - new_block(1:size_overlap, 1+size_overlap:size_block, :));
-        top = top .^ 2;
-        ssd_top = sum(top(:));
-        
-        ssd = ssd_left + ssd_top;
-        
-    else
-        error("MyError: unknown overlap type");
+        two_terms = img_squared_left - two_A_B;
+        ssd_left = sum(two_terms,3) + overlap_left_squared_sum;
+    
     end
+    
+    if overlap_type == "top" || overlap_type == "double"
+        % top = (current_block(1:size_overlap, 1:size_block, :) - new_block(1:size_overlap, 1:size_block, :));
+        % top = top .^ 2;
+        % ssd = sum(top(:));
+        
+        overlap_top = current_block(1:size_overlap, 1:size_block, :);
+        overlap_top_squared = overlap_top .^ 2;
+        overlap_top_squared_sum = sum(overlap_top_squared(:));
+        
+        if ch == 1
+            two_A_B = 2 * conv2(padarray(img,size(overlap_top)-1,'post'), rot90(overlap_top,2), 'valid');
+        elseif ch == 3
+            [h,w,~] = size(overlap_top);
+            two_A_B_red = 2 * conv2(padarray(img(:,:,1),[h-1 w-1],'post'), rot90(overlap_top(:,:,1),2), 'valid');
+            two_A_B_green = 2 * conv2(padarray(img(:,:,2),[h-1 w-1],'post'), rot90(overlap_top(:,:,2),2), 'valid');
+            two_A_B_blue = 2 * conv2(padarray(img(:,:,3),[h-1 w-1],'post'), rot90(overlap_top(:,:,3),2), 'valid');
+            two_A_B = zeros(height, width, ch);
+            two_A_B(:,:,1) = two_A_B_red;
+            two_A_B(:,:,2) = two_A_B_green;
+            two_A_B(:,:,3) = two_A_B_blue;
+        else
+            error("MyError: unexpected number of channels");
+        end
+        
+        two_terms = img_squared_top - two_A_B;
+        ssd_top = sum(two_terms,3) + overlap_top_squared_sum;
+        
+%     else
+%         error("MyError: unknown overlap type");
+    end
+    
+%     if overlap_type == "double" % do second overlap (top - left)
+        % left = (current_block(1:size_block, 1:size_overlap, :) - new_block(1:size_block, 1:size_overlap, :));
+        % left = left .^ 2;
+        % ssd_left = sum(left(:));
+        
+        % top = (current_block(1:size_overlap, 1+size_overlap:size_block, :) - new_block(1:size_overlap, 1+size_overlap:size_block, :));
+        % top = top .^ 2;
+        % ssd_top = sum(top(:));
+        
+        % ssd = ssd_left + ssd_top;
+        
+%         overlap_top_minus_left = current_block(1:size_overlap, 1+size_overlap:size_block, :);
+%         overlap_top_minus_left_squared = overlap_top_minus_left .^ 2;
+%         overlap_top_minus_left_squared_sum = sum(overlap_top_minus_left_squared(:));
+%         
+%         if ch == 1
+%             two_A_B = 2 * conv2(padarray(img,size(overlap_top_minus_left)-1,'post'), rot90(overlap_top_minus_left,2), 'valid');
+%         elseif ch == 3
+%             [h,w,~] = size(overlap_top_minus_left);
+%             two_A_B_red = 2 * conv2(padarray(img(:,:,1),[h-1 w-1],'post'), rot90(overlap_top_minus_left(:,:,1),2), 'valid');
+%             two_A_B_green = 2 * conv2(padarray(img(:,:,2),[h-1 w-1],'post'), rot90(overlap_top_minus_left(:,:,2),2), 'valid');
+%             two_A_B_blue = 2 * conv2(padarray(img(:,:,3),[h-1 w-1],'post'), rot90(overlap_top_minus_left(:,:,3),2), 'valid');
+%             two_A_B = zeros(height, width, ch);
+%             two_A_B(:,:,1) = two_A_B_red;
+%             two_A_B(:,:,2) = two_A_B_green;
+%             two_A_B(:,:,3) = two_A_B_blue;
+%         else
+%             error("MyError: unexpected number of channels");
+%         end
+%         
+%         two_A_B = two_A_B(:, 1+size_overlap:end, :);
+%         two_A_B = padarray(two_A_B, [0 size_overlap], inf, 'post');
+%         
+%         two_terms = img_squared_top_minus_left - two_A_B;
+%         ssd2 = sum(two_terms,3) + overlap_top_minus_left_squared_sum;
+%         ssd2(ssd2==0) = inf;
+%         ssd = ssd + ssd2;
+%         
+%     end
+    
+    
+    % Final SSD
+    ssd = ssd_left + ssd_top;
+    
     
     % Avoid repeating blocks by not using SDD = 0
-    if ssd == 0
-        ssd = inf;
-    end
+    ssd(ssd<=0) = inf;
     
+
     % Extra SSD for Texture Transfer
     if bool_transfer
         region = (block_transfer - new_block) .^ 2;
