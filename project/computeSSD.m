@@ -1,4 +1,4 @@
-function [ssd] = getSSD(current_block, new_block, size_overlap, overlap_type)
+function [ssd] = computeSSD(current_block, new_block, size_overlap, overlap_type, bool_transfer, block_transfer, alpha)
     
     size_block = size(current_block, 1);
     
@@ -25,6 +25,18 @@ function [ssd] = getSSD(current_block, new_block, size_overlap, overlap_type)
         
     else
         error("MyError: unknown overlap type");
+    end
+    
+    % Avoid repeating blocks by not using SDD = 0
+    if ssd == 0
+        ssd = inf;
+    end
+    
+    % Extra SSD for Texture Transfer
+    if bool_transfer
+        region = (block_transfer - new_block) .^ 2;
+        correspondence_error = sum(region(:));
+        ssd = (alpha) * (ssd) + (1-alpha) * correspondence_error;
     end
     
 end

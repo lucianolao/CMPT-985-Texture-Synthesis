@@ -1,4 +1,4 @@
-function [I] = getRandomBlock(img, size_block)
+function [I] = getRandomBlock(img, size_block, bool_transfer, img_transfer)
 
     [height, width, ~] = size(img);
     

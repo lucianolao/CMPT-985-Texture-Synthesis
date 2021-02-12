@@ -1,4 +1,4 @@
-function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, overlap_type, use_seam_cut)
+function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, overlap_type, bool_seam_cut, bool_transfer, img_transfer, alpha)
 
     [height, width, ~] = size(img);
     size_block = size(current_block, 1);
@@ -7,15 +7,16 @@ function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, ov
     max_initial_width = width - size_block + 1;
     
     errors_of_all_patches = zeros(max_initial_height, max_initial_width);
+    block_transfer = 0;
     
     % Compute all errors
     for i = 1:1:max_initial_height
         for j = 1:1:max_initial_width
             new_block = img(i:i+size_block-1, j:j+size_block-1, :);
-            ssd = getSSD(current_block, new_block, size_overlap, overlap_type);
-            if ssd == 0
-                ssd = inf;
+            if bool_transfer
+                block_transfer = img_transfer(i:i+size_block-1, j:j+size_block-1, :);
             end
+            [ssd] = computeSSD(current_block, new_block, size_overlap, overlap_type, bool_transfer, block_transfer, alpha);
             errors_of_all_patches(i,j) = ssd;
         end
     end
@@ -41,7 +42,7 @@ function [I] = pickBlock(img, current_block, size_overlap, tolerance, n_best, ov
     I = img(i:i+size_block-1, j:j+size_block-1, :);
     
     % Minimum Error Boundary Cut for Method 3
-    if use_seam_cut
+    if bool_seam_cut
         I = seamCut(current_block, I, size_overlap, overlap_type);
     end
     
