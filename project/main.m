@@ -52,7 +52,7 @@ img_transfer = img_ml;
 % Run many images syntheses
 tic
 
-run(img_rice, "rice", 30, 5, tolerance, n_best, img_transfer, alpha);
+% run(img_rice, "rice", 30, 5, tolerance, n_best, img_transfer, alpha);
 % run(img_brick, "brick", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_radishes, "radishes", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_text, "text", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
@@ -61,7 +61,7 @@ run(img_rice, "rice", 30, 5, tolerance, n_best, img_transfer, alpha);
 % run(img_grass, "grass", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_random, "random", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_random3, "random3", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
-% run(img_toast, "toast", 100, 5, tolerance, n_best, img_transfer, alpha);
+run(img_toast, "toast", 100, 5, tolerance, n_best, img_transfer, alpha);
 
 toc
 
@@ -69,7 +69,7 @@ toc
 %% Function to automatize
 function run(img_texture, img2save, size_block, size_overlap, tolerance, n_best, img_transfer, alpha)
     
-folder = "results/";
+folder = "../results/";
 [out_height, out_width, ~] = size(img_texture);
 out_height = out_height * 5;
 out_width = out_width * 5;
@@ -92,7 +92,7 @@ size_block = 15;
 size_overlap = 5;
 
 I4 = transfer(img_texture, size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
-% imwrite(I4, strcat("../../",folder,img2save,"_4_",num2str(size_block),"_",num2str(size_overlap),"_",num2str(alpha),".jpg"));
+% imwrite(I4, strcat(folder,img2save,"_4_",num2str(size_block),"_",num2str(size_overlap),"_",num2str(alpha),".jpg"));
 figure; imshow(I4);
 
 disp(img2save);
