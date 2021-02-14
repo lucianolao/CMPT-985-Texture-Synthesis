@@ -7,8 +7,8 @@ close all
 size_block = 50;
 size_overlap = 10;
 tolerance = 1.5;
-n_best = 50;
-alpha = 0.90;
+n_best = 10;
+alpha = 0.7;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -46,11 +46,13 @@ img_ml = im2double(imread("images/ml.jpg"));
 
 %% Synthesize and Transfer
 
-img_transfer = img_al;
-% img_transfer = img_ml;
+% img_transfer = img_al;
+img_transfer = img_ml;
 
 % Run many images syntheses
-% run(img_rice, "rice", 30, 5, tolerance, n_best, img_transfer, alpha);
+tic
+
+run(img_rice, "rice", 30, 5, tolerance, n_best, img_transfer, alpha);
 % run(img_brick, "brick", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_radishes, "radishes", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_text, "text", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
@@ -59,7 +61,9 @@ img_transfer = img_al;
 % run(img_grass, "grass", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_random, "random", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_random3, "random3", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
-% run(img_toast, "toast", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
+% run(img_toast, "toast", 100, 5, tolerance, n_best, img_transfer, alpha);
+
+toc
 
 
 %% Function to automatize
@@ -73,20 +77,23 @@ out_width = out_width * 5;
 % out_width = 160;
 
 I1 = method_1(img_texture, size_block, size_overlap, out_height, out_width);
-imwrite(I1, strcat("../../",folder,img2save,"_1_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
-% imshow(I1);
+% imwrite(I1, strcat("../../",folder,img2save,"_1_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
+figure; imshow(I1);
 
 I2 = method_2(img_texture, size_block, size_overlap, out_height, out_width, tolerance, n_best);
-imwrite(I2, strcat("../../",folder,img2save,"_2_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
-% imshow(I2);
+% imwrite(I2, strcat("../../",folder,img2save,"_2_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
+figure; imshow(I2);
 
 I3 = method_3(img_texture, size_block, size_overlap, out_height, out_width, tolerance, n_best);
-imwrite(I3, strcat("../../",folder,img2save,"_3_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
-% imshow(I3);
+% imwrite(I3, strcat("../../",folder,img2save,"_3_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
+figure; imshow(I3);
 
-% I4 = transfer(img_texture, size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
+size_block = 15;
+size_overlap = 5;
+
+I4 = transfer(img_texture, size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % imwrite(I4, strcat("../../",folder,img2save,"_4_",num2str(size_block),"_",num2str(size_overlap),"_",num2str(alpha),".jpg"));
-% imshow(I4);
+figure; imshow(I4);
 
 disp(img2save);
 end

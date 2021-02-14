@@ -8,7 +8,7 @@ function [I] = method_1(img, size_block, size_overlap, out_height, out_width)
     
     for i = 1 : size_non_overlap : out_height
         for j = 1 : size_non_overlap : out_width
-            I(i:i+size_block-1, j:j+size_block-1, :) = getRandomBlock(img, size_block);
+            I(i:i+size_block-1, j:j+size_block-1, :) = getRandomBlock(img, size_block, 0, false);
         end
     end
     
