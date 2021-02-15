@@ -60,8 +60,8 @@ tic
 % run(img_apples, "apples", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_grass, "grass", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
 % run(img_random, "random", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
-% run(img_random3, "random3", size_block, size_overlap, tolerance, n_best, img_transfer, alpha);
-run(img_toast, "toast", 100, 5, tolerance, n_best, img_transfer, alpha);
+% run(img_random3, "random3", 150, 15, tolerance, n_best, img_transfer, alpha);
+run(img_toast, "toast", 100, 15, tolerance, n_best, img_transfer, alpha);
 
 toc
 
@@ -77,15 +77,15 @@ out_width = out_width * 5;
 % out_width = 160;
 
 I1 = method_1(img_texture, size_block, size_overlap, out_height, out_width);
-% imwrite(I1, strcat("../../",folder,img2save,"_1_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
+% imwrite(I1, strcat(folder,img2save,"_1_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
 figure; imshow(I1);
 
 I2 = method_2(img_texture, size_block, size_overlap, out_height, out_width, tolerance, n_best);
-% imwrite(I2, strcat("../../",folder,img2save,"_2_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
+% imwrite(I2, strcat(folder,img2save,"_2_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
 figure; imshow(I2);
 
 I3 = method_3(img_texture, size_block, size_overlap, out_height, out_width, tolerance, n_best);
-% imwrite(I3, strcat("../../",folder,img2save,"_3_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
+% imwrite(I3, strcat(folder,img2save,"_3_",num2str(size_block),"_",num2str(size_overlap),".jpg"));
 figure; imshow(I3);
 
 size_block = 15;
